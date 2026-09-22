@@ -9,7 +9,7 @@ const UI = {
     dir: "ltr",
     lang: "en",
     siteName: "Najla Chicago Salon",
-    siteNameShort: "Najla Chicago",
+    siteNameShort: "Najla's Chicago Ladies Salon",
     nav: {
       home: "Home",
       about: "About",
@@ -136,7 +136,7 @@ const UI = {
     dir: "rtl",
     lang: "ar",
     siteName: "صالون نجلاء شيكاغو",
-    siteNameShort: "نجلاء شيكاغو",
+    siteNameShort: "صالون نجلاء شيكاغو للسيدات",
     nav: {
       home: "الرئيسية",
       about: "من نحن",

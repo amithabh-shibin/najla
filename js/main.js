@@ -13,8 +13,8 @@
      CONFIG — edit these placeholders when real business details arrive
      --------------------------------------------------------------------- */
   const CONFIG = {
-    whatsappNumber: "971555965577", // primary — digits only, used for Book Now / hero / FAB / WhatsApp icon
-    whatsappNumberSecondary: "971529527752", // shown as a second contact line, also click-to-WhatsApp
+    whatsappNumber: "971529527752", // primary — digits only, used for Book Now / hero / FAB / WhatsApp icon
+    whatsappNumberSecondary: "", // shown as a second contact line, also click-to-WhatsApp
     whatsappDefaultMessage: {
       en: "Hi Najla Chicago Salon! I'd like to book an appointment.",
       ar: "مرحبًا صالون نجلاء شيكاغو! أرغب في حجز موعد."
@@ -139,7 +139,10 @@
     const callFab = $("#callFab");
     if (callFab) callFab.setAttribute("href", `tel:+${CONFIG.whatsappNumber}`);
 
-    const numbers = [CONFIG.whatsappNumber, CONFIG.whatsappNumberSecondary];
+    const numbers = [
+  CONFIG.whatsappNumber,
+  CONFIG.whatsappNumberSecondary
+].filter(Boolean);
     const phoneLinesHtml = numbers
       .map((n) => `<a href="${buildWhatsAppLink(n)}" target="_blank" rel="noopener" class="phone-link">${formatPhone(n)}</a>`)
       .join("<br>");
