@@ -1,0 +1,1642 @@
+/* =========================================================================
+   Najla Chicago Salon — stylesheet
+   ========================================================================= */
+
+:root {
+  /* Clay/terracotta surfaces */
+  --bg:          #efdccf;
+  --bg-alt:      #e4cab9; /* midpoint between --bg and --surface, kept
+                              visible as a step now that --surface itself
+                              got much deeper than the old near-white */
+  --surface:     #d9b8a3;
+  --surface-alt: #e4cab9;
+  --border:      rgba(156, 90, 70, 0.22);
+
+  /* Terracotta accents — 700 is the text-safe shade for small text on
+     light surfaces (eyebrows, labels, stat values); 500/600 are for
+     buttons, gradients and larger/decorative use; 300/100 are light
+     accents used on dark surfaces (hero photo, footer) and are
+     deliberately left on the old, lighter gold family below — their job
+     is contrast against those dark backgrounds, not matching this
+     lighter surface palette. */
+  --gold-700: #7e4633;
+  --gold-600: #9c5a46;
+  --gold-500: #c98874;
+  --gold-300: #dba28f;
+  --gold-100: #f3ddd3;
+  --gold:     var(--gold-600);
+
+  /* Text */
+  --ink:        #2a1d19;
+  /* Darkened from the old #6e5b54 (kept, same hue/saturation) — that
+     value gave 6.4:1 against the old white --surface, but only 3.45:1
+     against the new, notably darker --surface (#d9b8a3), failing AA for
+     normal text (testimonial quotes, contact details, stat labels all
+     use it on that background). #544540 clears both: 4.9:1 on --surface,
+     6.9:1 on --bg. */
+  --ink-soft:   #544540;
+  --black-text: #2a1512;
+  --white:      #ffffff;
+
+  /* Semantic aliases — the names the Services menu is written against.
+     Same values as above, so there's still one palette, not two:
+       --accent        #9c5a46  pill fill, hovers, decorative accents
+       --accent-strong #7e4633  buttons, links, small text (4.0:1 on
+                                --surface for bold text ≥14px — a shade
+                                under the 4.5:1 AA text minimum; fine for
+                                large/bold labels, worth revisiting if
+                                strict AA compliance matters more than
+                                the exact requested hex)
+       --text          #2a1d19
+       --text-muted    #544540  (4.9:1 on --surface, 6.9:1 on --bg) */
+  --accent:        var(--gold-600);
+  --accent-strong: var(--gold-700);
+  --text:          var(--ink);
+  --text-muted:    var(--ink-soft);
+  --surface-nude:  var(--surface-alt);
+
+  /* Light text for content that sits directly on a dark photo overlay
+     (Hero, Services banner) — kept separate from --ink so the body theme
+     can stay light while those photo sections stay legible. */
+  --on-photo:      #fff9f5;
+  --on-photo-soft: rgba(255, 249, 245, 0.85);
+
+  /* Deliberately dark footer — an anchor of contrast against the light
+     body rather than following --bg-alt. */
+  --footer-bg: #241713;
+
+  --font-heading: 'Playfair Display', 'Cormorant', serif;
+  --font-body: 'Poppins', sans-serif;
+  --font-arabic: 'Cairo', 'Tajawal', 'Noto Kufi Arabic', sans-serif;
+  --font-script: 'Dancing Script', cursive;
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --shadow-sm: 0 4px 16px rgba(126, 70, 51, 0.10);
+  --shadow-md: 0 12px 32px rgba(126, 70, 51, 0.14);
+  --shadow-lg: 0 20px 50px rgba(126, 70, 51, 0.20);
+
+  --header-h: 84px;
+
+  /* Directional overlay gradient for photo backgrounds — mirrors in RTL.
+     Used where text sits directly on the photo (Hero, section-heading
+     banners). Kept light so the photo itself stays clearly visible,
+     with just enough dark tint for text contrast. */
+  --overlay-dir: to bottom right;
+  --overlay-from: rgba(36, 23, 19, 0.5);
+  --overlay-to: rgba(36, 23, 19, 0.78);
+
+  /* Edge scrim for the Hero, whose photo has no naturally dark side —
+     darkest behind the text column, fading out toward the open, brighter
+     part of the photo. Direction flips with --overlay-dir under RTL. */
+  --hero-scrim-dir: to right;
+
+  /* Lighter wash for photo backgrounds that only ever peek through behind
+     opaque cards (the Services category panels) — a light tint instead of
+     a heavy tint that obscures the photo. */
+  --overlay-light-from: rgba(36, 23, 19, 0.45);
+  --overlay-light-to: rgba(36, 23, 19, 0.68);
+
+  /* Motion — every slide/stagger animation in the Services tabs reads
+     these, so the feel can be tuned from one place. Tab-indicator and
+     content-slide durations are intentionally separate: the indicator
+     is a small element that should feel snappy, the content slide is
+     the larger, more deliberate motion. */
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-indicator-duration: 220ms;
+  --motion-exit-duration: 160ms;
+  --motion-duration: 300ms;
+  --motion-slide-distance: 32px;
+  --row-duration: 380ms;
+  --row-slide-distance: 16px;
+  --row-stagger-step: 50ms;
+  --row-stagger-max: 600ms;
+}
+
+html[dir="rtl"] {
+  --overlay-dir: to bottom left;
+  --hero-scrim-dir: to left;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+button { font: inherit; cursor: pointer; border: none; background: none; }
+input { font: inherit; }
+
+/* Keeps content in the DOM for screen readers/SEO (e.g. the page's one
+   required h1) without showing it visually. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+html[dir="rtl"] body,
+html[lang="ar"] body {
+  font-family: var(--font-arabic);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4 {
+  font-family: var(--font-arabic);
+  font-weight: 700;
+}
+
+section { padding: 96px 0; position: relative; }
+@media (max-width: 768px) { section { padding: 64px 0; } }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+  margin-bottom: 10px;
+}
+html[dir="rtl"] .eyebrow { letter-spacing: normal; }
+
+.section-heading { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+.section-heading h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); margin-bottom: 14px; }
+.section-subtitle { color: var(--ink-soft); font-size: 1.02rem; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold-600), var(--gold-500));
+  color: var(--black-text);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn-outline {
+  background: transparent;
+  color: var(--gold-700);
+  border: 1.5px solid var(--gold-600);
+}
+.btn-outline:hover { background: var(--gold-600); color: var(--black-text); transform: translateY(-2px); }
+.btn-lg { padding: 16px 34px; font-size: 1rem; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: var(--header-h);
+  background: rgba(239, 220, 207, 0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-bottom: 1px solid rgba(156, 90, 70, 0.22);
+  transition: box-shadow 0.3s ease;
+}
+.site-header.scrolled { box-shadow: 0 4px 24px rgba(126, 70, 51, 0.18); }
+
+.header-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.brand-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--gold-700);
+  letter-spacing: 0.01em;
+}
+html[dir="rtl"] .brand-name { font-family: var(--font-arabic); }
+
+.main-nav ul { display: flex; gap: 34px; }
+.main-nav a {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink);
+  position: relative;
+  padding: 6px 0;
+}
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 2px;
+  background: var(--gold-600);
+  transition: width 0.25s ease;
+}
+.main-nav a:hover::after { width: 100%; }
+
+.header-actions { display: flex; align-items: center; gap: 14px; }
+
+.lang-toggle {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--gold-700);
+  border: 1.5px solid var(--gold-700);
+  border-radius: 50px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+.lang-toggle:hover { background: var(--surface-alt); }
+
+.btn-book-now { padding: 10px 22px; font-size: 0.88rem; }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px; height: 32px;
+}
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--gold-700);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  padding-top: var(--header-h);
+  text-align: left;
+  overflow: hidden;
+}
+/* flex-end resolves to the physical left under RTL (main-end flips with
+   direction), which is exactly where we want the text column to stay —
+   over the photo's dark side, since the photo itself never mirrors. */
+html[dir="rtl"] .hero { justify-content: flex-end; text-align: right; }
+.hero-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--hero-scrim-dir), rgba(36, 23, 19, 0.72) 0%, rgba(36, 23, 19, 0.4) 38%, rgba(36, 23, 19, 0.08) 62%, rgba(36, 23, 19, 0) 82%),
+    url('../assets/images/optimized/banner-image-5.jpg');
+  /* Subject/hair already sit right-of-centre with plain background on
+     the left, but the photo's own aspect ratio (1.75:1) is close enough
+     to most viewports' that `cover` alone leaves little to no horizontal
+     slack to pan with — zoomed in a bit here purely to unlock room to
+     push the hair further right, off the text column. */
+  background-size: 140% auto;
+  background-position: 4% 26%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 0;
+}
+/* Mirrors the crop so the hair shifts to the opposite side from wherever
+   the text column lands, matching .hero's RTL text flip below. */
+html[dir="rtl"] .hero-bg { background-position: 96% 26%; }
+@media (max-width: 768px) {
+  .hero-bg {
+    background-attachment: scroll;
+    /* The 140%-zoom above is sized off *width* to create horizontal pan
+       room on wide/short viewports — on a narrow/tall phone screen that
+       same width-based sizing under-covers the height badly (aspect
+       ratio math, not a typo). Text is centered under 640px anyway (see
+       .hero-inner below), so there's no side to keep clear for it here;
+       plain `cover` both fully covers the frame and, being landscape
+       cropped into a portrait box, still leaves plenty of its own
+       horizontal slack to bias toward the hair/face. */
+    background-size: cover;
+    background-position: 64% center;
+  }
+  html[dir="rtl"] .hero-bg { background-position: 64% center; }
+}
+
+/* Decorative side text + script accent, echoing the editorial-magazine
+   feel of the reference layout. Purely atmospheric, so aria-hidden and
+   dropped on narrow viewports where they'd collide with the stacked,
+   centered mobile hero content. Pinned to the physical right always
+   (not mirrored under RTL) because they sit over the photo's empty
+   right-hand side, and the photo itself doesn't flip for RTL — the
+   main text column also stays physically left for the same reason
+   (see .hero's RTL rule below). */
+.hero-side-text {
+  position: absolute;
+  top: 130px;
+  right: 36px;
+  z-index: 1;
+  margin: 0;
+  width: 110px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.7;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--gold-300);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+.hero-script {
+  position: absolute;
+  bottom: 200px;
+  right: 56px;
+  z-index: 1;
+  margin: 0;
+  max-width: 260px;
+  text-align: right;
+  pointer-events: none;
+}
+.hero-script-line {
+  font-family: var(--font-script);
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  color: var(--gold-300);
+  margin: 0;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
+}
+html[dir="rtl"] .hero-script-line { font-family: var(--font-arabic); font-style: normal; font-weight: 700; }
+.hero-script-sub {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--on-photo);
+  margin: 4px 0 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+}
+@media (max-width: 900px) {
+  .hero-side-text, .hero-script { display: none; }
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 0;
+  padding-left: clamp(24px, 6vw, 56px);
+  padding-right: clamp(24px, 6vw, 56px);
+}
+.hero-inner .eyebrow,
+.hero-headline,
+.hero-slogan { text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7); }
+.hero-eyebrow { font-size: 0.85rem; letter-spacing: 0.2em; margin-bottom: 18px; color: var(--gold-300); }
+.hero-headline {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.1;
+  margin-bottom: 18px;
+  color: var(--on-photo);
+}
+.hero-headline-line { display: block; }
+.hero-headline em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold-500);
+}
+html[dir="rtl"] .hero-headline em { font-style: normal; }
+.hero-slogan {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  color: var(--gold-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+html[dir="rtl"] .hero-slogan { font-family: var(--font-arabic); font-weight: 700; text-transform: none; letter-spacing: 0; }
+.hero-ctas { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin-bottom: 40px; }
+.hero-cta-primary { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.88rem; }
+html[dir="rtl"] .hero-cta-primary svg { transform: scaleX(-1); }
+.hero-cta-secondary {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-photo);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+  border-bottom: 1.5px solid var(--gold-500);
+  padding-bottom: 3px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.hero-cta-secondary:hover { color: var(--gold-300); border-color: var(--gold-300); }
+
+.hero-highlights { display: flex; gap: 30px; flex-wrap: wrap; }
+.hero-highlight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 92px;
+}
+html[dir="rtl"] .hero-highlight { align-items: flex-end; }
+.hero-highlight svg { color: var(--gold-500); flex-shrink: 0; }
+.hero-highlight span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--on-photo-soft);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+}
+@media (max-width: 640px) {
+  .hero-inner { text-align: center; margin-inline: auto; }
+  html[dir="rtl"] .hero-inner { text-align: center; }
+  .hero-ctas, .hero-highlights { justify-content: center; }
+  .hero-highlight { align-items: center; }
+  html[dir="rtl"] .hero-highlight { align-items: center; }
+}
+
+/* ---------- About ---------- */
+.about-inner {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 64px;
+  align-items: center;
+}
+.about-media { position: relative; }
+.about-media-frame {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 4/5;
+}
+.about-media-frame img { width: 100%; height: 100%; object-fit: cover; }
+.about-media-accent {
+  position: absolute;
+  bottom: -24px; left: -24px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-600));
+  opacity: 0.5;
+  z-index: -1;
+}
+html[dir="rtl"] .about-media-accent { left: auto; right: -24px; }
+
+.about-content p { color: var(--ink-soft); margin-bottom: 16px; }
+.about-content h2 { margin-bottom: 20px; }
+
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 32px;
+}
+.stat-box {
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 10px;
+}
+.stat-box .stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gold-700);
+  display: block;
+}
+.stat-box .stat-label {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+/* ---------- Services ---------- */
+.services { background: linear-gradient(180deg, var(--bg), var(--bg-alt)); }
+
+/* "Services & Price List" heading sits on its own full-width photo banner —
+   contained (not the whole, very tall, section) so the overlay gradient
+   reads the same well-tested way it does behind the Hero, instead of
+   fading to a low-contrast patch by the time it reaches the price list. */
+.services .section-heading {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 56px 24px;
+  margin-inline: auto;
+  margin-bottom: 56px;
+  box-shadow: var(--shadow-md);
+  max-width: 100%;
+}
+.services .section-heading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--overlay-dir), var(--overlay-from), var(--overlay-to)),
+    url('../assets/images/optimized/banner-image-4.jpg');
+  background-size: cover;
+  background-position: 50% 15%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+@media (max-width: 768px) {
+  .services .section-heading::before { background-attachment: scroll; }
+  .services .section-heading { padding: 40px 20px; }
+}
+.services .section-heading > * {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+}
+/* This heading sits on the photo banner, not the light body, so it needs
+   the on-photo text colors rather than the ones the body sections use. */
+.services .section-heading .eyebrow { color: var(--gold-300); }
+.services .section-heading h2 { color: var(--on-photo); }
+.services .section-heading .section-subtitle { color: var(--on-photo-soft); }
+
+/* ---------- Services menu ----------
+   Category pills (sticky) → subcategory rail (sidebar ≥768px, chip row
+   below) → panel of service cards. Motion is transform/opacity only; all
+   durations, easing and travel distances are the variables below. */
+.services {
+  --svc-duration: 320ms;
+  --svc-duration-fast: 180ms;
+  --svc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --svc-stagger: 50ms;
+  --svc-stagger-total: 400ms;
+  --svc-rise: 14px;
+  --svc-slide: 28px;
+  --svc-radius: 24px;
+  --svc-radius-sm: 16px;
+  --svc-shadow: 0 10px 34px rgba(126, 70, 51, 0.09);
+  --svc-shadow-lift: 0 14px 28px rgba(126, 70, 51, 0.16);
+  --svc-hairline: rgba(156, 90, 70, 0.16);
+}
+
+/* Sticky pill bar. Full-bleed so the blurred backdrop spans the viewport
+   while the pills themselves stay on the container grid. */
+.services-pillbar {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  padding: 14px 0;
+  margin-bottom: 30px;
+  background: rgba(239, 220, 207, 0.86);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+.services-tabs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+/* Sliding pill highlight — positioned/sized from JS against the real tab
+   it sits behind, moved with transform only. Width/height are assigned
+   directly rather than transitioned: animating those is what actually
+   costs layout on cheap phones. */
+.tab-indicator {
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 50px;
+  background: var(--accent);
+  box-shadow: 0 6px 16px rgba(126, 70, 51, 0.22);
+  transition: transform var(--svc-duration) var(--svc-ease);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 0;
+}
+.tab-indicator.no-anim { transition: none; }
+
+.services-tab {
+  position: relative;
+  z-index: 1;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  background: transparent;
+  flex-shrink: 0;
+  transition: color var(--svc-duration-fast) var(--svc-ease);
+}
+html[dir="rtl"] .services-tab { font-family: var(--font-arabic); }
+.services-tab:hover { color: var(--accent-strong); }
+.services-tab.active { color: var(--white); font-weight: 600; }
+.services-tab:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* ---------- Menu shell ---------- */
+.services-menu {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+/* Categories with a single subcategory (Massage, Moroccan Bath, Henna,
+   Eyelash & Eyebrow) drop the rail entirely — one item in it is just a
+   dead column — and give the width to the cards instead. */
+.services-menu.is-single { grid-template-columns: minmax(0, 1fr); }
+.services-menu.is-single .services-rail-wrap { display: none; }
+
+/* ---------- Subcategory rail ---------- */
+.services-rail-wrap {
+  position: sticky;
+  top: calc(var(--header-h) + 88px);
+}
+.services-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  max-height: min(62vh, 540px);
+  overflow-y: auto;
+  border-radius: var(--svc-radius);
+  background: var(--surface-alt);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 70, 51, 0.3) transparent;
+}
+.services-rail::-webkit-scrollbar { width: 6px; }
+.services-rail::-webkit-scrollbar-thumb {
+  background: rgba(126, 70, 51, 0.28);
+  border-radius: 50px;
+}
+/* Soft fade so a scrollable rail reads as "more below" rather than a hard cut. */
+.services-rail-fade {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 44px;
+  pointer-events: none;
+  border-radius: 0 0 var(--svc-radius) var(--svc-radius);
+  background: linear-gradient(to top, var(--surface-alt) 20%, rgba(235, 217, 207, 0));
+}
+
+/* The white card that slides between rail items; the accent bar rides on
+   its inline-start edge so it mirrors under RTL. */
+.rail-indicator {
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: var(--svc-radius-sm);
+  background: var(--white);
+  box-shadow: 0 6px 18px rgba(126, 70, 51, 0.14);
+  transition: transform var(--svc-duration) var(--svc-ease);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 0;
+}
+.rail-indicator::before {
+  content: "";
+  position: absolute;
+  inset-block: 11px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+.rail-indicator.no-anim { transition: none; }
+
+.rail-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 14px;
+  border-radius: var(--svc-radius-sm);
+  font-size: 0.89rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: start;
+  transition: color var(--svc-duration-fast) var(--svc-ease);
+}
+html[dir="rtl"] .rail-item { font-family: var(--font-arabic); }
+.rail-item[hidden] { display: none; }
+.rail-item:hover { color: var(--text); }
+.rail-item.active { color: var(--accent-strong); font-weight: 600; }
+.rail-item:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: -2px;
+  border-radius: var(--svc-radius-sm);
+}
+.rail-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-item-count {
+  flex-shrink: 0;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.72);
+  transition: color var(--svc-duration-fast) var(--svc-ease),
+              background var(--svc-duration-fast) var(--svc-ease);
+}
+.rail-item.active .rail-item-count {
+  color: var(--accent-strong);
+  background: var(--gold-100);
+}
+
+/* ---------- Service panel ----------
+   Fixed height, photo backdrop (services-data.js → image, set from JS in
+   renderPanel), the header pinned at top and the card body scrolling
+   inside it. Because the photo sits on this outer element rather than on
+   the body that actually scrolls, it stays put — a static backdrop the
+   cards glide over — with no parallax trickery needed. */
+.services-panel {
+  position: relative;
+  min-width: 0;
+  height: clamp(420px, 74vh, 640px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--svc-radius);
+  background-color: var(--white);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: var(--svc-shadow);
+  overflow: hidden; /* clips the photo to the panel's rounded corners */
+}
+.services-panel:focus { outline: none; }
+
+.svc-panel-head {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 22px 24px;
+}
+.svc-panel-icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: var(--white);
+  background: var(--accent);
+  transition: background var(--svc-duration-fast) var(--svc-ease),
+              color var(--svc-duration-fast) var(--svc-ease);
+}
+.services-panel.has-photo .svc-panel-icon {
+  color: var(--on-photo);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.svc-panel-heading { flex: 1; min-width: 0; }
+.svc-panel-title {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text);
+  transition: color var(--svc-duration-fast) var(--svc-ease);
+}
+html[dir="rtl"] .svc-panel-title { font-family: var(--font-arabic); font-weight: 700; }
+.svc-panel-count {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: color var(--svc-duration-fast) var(--svc-ease);
+}
+.services-panel.has-photo .svc-panel-title {
+  color: var(--on-photo);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+.services-panel.has-photo .svc-panel-count {
+  color: var(--on-photo-soft);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* The scrollable body — fills whatever height the header leaves inside
+   the panel's fixed height. min-height:0 is the part that's easy to
+   forget: without it a flex child refuses to shrink below its content
+   size, and the scrollbar never appears. */
+.svc-panel-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 24px 26px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 70, 51, 0.3) transparent;
+}
+.svc-panel-body::-webkit-scrollbar { width: 6px; }
+.svc-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(126, 70, 51, 0.28);
+  border-radius: 50px;
+}
+/* Soft fade at the foot of the panel so a scrollable body reads as "more
+   below" rather than a hard cut — same trick as .services-rail-fade.
+   A sibling of .svc-panel-body, not a pseudo-element on it, so it stays
+   pinned while the body scrolls underneath it. */
+.svc-panel-fade {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 0;
+  bottom: 0;
+  height: 56px;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(36, 23, 19, 0.16), rgba(36, 23, 19, 0));
+  opacity: 0;
+  transition: opacity var(--svc-duration-fast) var(--svc-ease);
+}
+/* Only shown once JS (updatePanelFade in main.js) confirms the body
+   actually overflows — a fade with nothing left to scroll to reads as a
+   rendering glitch, not an affordance. */
+.svc-panel-fade.is-visible { opacity: 1; }
+
+.svc-search {
+  position: relative;
+  flex-shrink: 0;
+  width: min(258px, 100%);
+}
+.svc-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 40px;
+  border-radius: 50px;
+  border: 1px solid rgba(156, 90, 70, 0.24);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color var(--svc-duration-fast) var(--svc-ease),
+              box-shadow var(--svc-duration-fast) var(--svc-ease);
+}
+.svc-search input::placeholder { color: var(--text-muted); }
+.svc-search input::-webkit-search-cancel-button { display: none; }
+.svc-search input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(156, 90, 70, 0.16);
+}
+/* Frosted glass over a photo — translucent instead of the opaque --bg
+   fill, plus extra lift so it stays crisply separated from a busy photo
+   edge rather than relying on its 1px border alone. */
+.services-panel.has-photo .svc-search input {
+  background: rgba(239, 220, 207, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 14px rgba(36, 23, 19, 0.22);
+}
+.services-panel.has-photo .svc-search input:focus {
+  box-shadow: 0 4px 14px rgba(36, 23, 19, 0.22), 0 0 0 3px rgba(156, 90, 70, 0.28);
+}
+.svc-search-icon {
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-strong);
+  pointer-events: none;
+}
+.svc-search-clear {
+  position: absolute;
+  inset-inline-end: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: color var(--svc-duration-fast) var(--svc-ease),
+              background var(--svc-duration-fast) var(--svc-ease);
+}
+.svc-search-clear[hidden] { display: none; }
+.svc-search-clear:hover { color: var(--accent-strong); background: var(--surface-alt); }
+
+/* Directional slide when the main category changes; --svc-dir is set from
+   JS (-1 / 0 / 1) and already accounts for RTL. */
+.svc-panel-body.is-entering {
+  animation: svc-enter var(--svc-duration) var(--svc-ease) both;
+}
+@keyframes svc-enter {
+  from { opacity: 0; transform: translateX(calc(var(--svc-dir, 0) * var(--svc-slide))); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Service cards ---------- */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+/* Row layout — icon, text column, action — all vertically centred, so a
+   name-only service (most of them until durations/descriptions land)
+   still reads as one block rather than a name and a button at opposite
+   ends of an empty card. */
+.svc-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--svc-radius-sm);
+  border: 1px solid var(--svc-hairline);
+  background: var(--bg);
+  opacity: 0;
+  transform: translateY(var(--svc-rise));
+  transition: opacity var(--svc-duration) var(--svc-ease),
+              transform var(--svc-duration-fast) var(--svc-ease),
+              box-shadow var(--svc-duration-fast) var(--svc-ease),
+              border-color var(--svc-duration-fast) var(--svc-ease);
+}
+.svc-card.is-in:hover { border-color: rgba(156, 90, 70, 0.34); }
+
+/* Frosted glass over a photo — the card becomes a translucent, blurred
+   chip the backdrop shows through, rather than an opaque tile sitting on
+   top of it. Conditional on .has-photo: without a photo behind it there's
+   nothing to show through, so the opaque --bg fill above is what shows. */
+.services-panel.has-photo .svc-card {
+  background: rgba(239, 220, 207, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.services-panel.has-photo .svc-card.is-in:hover {
+  background: rgba(239, 220, 207, 0.78);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.services-panel.has-photo .svc-card.is-addon {
+  background: rgba(243, 221, 211, 0.58);
+}
+.services-panel.has-photo .svc-card.is-addon.is-in:hover {
+  background: rgba(243, 221, 211, 0.75);
+}
+
+.svc-card-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--accent-strong);
+  background: var(--gold-100);
+}
+.svc-card.is-addon .svc-card-icon {
+  color: var(--white);
+  background: var(--accent);
+}
+.svc-card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.svc-card.is-in { opacity: 1; transform: none; }
+.svc-card.is-in:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--svc-shadow-lift);
+}
+.svc-card.is-addon { background: rgba(243, 221, 211, 0.52); }
+
+.svc-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.svc-tag {
+  padding: 3px 9px;
+  border-radius: 50px;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+html[dir="rtl"] .svc-tag { letter-spacing: normal; }
+.svc-tag-addon { background: var(--accent-strong); color: var(--white); }
+.svc-tag-popular { background: var(--gold-100); color: var(--accent-strong); }
+
+.svc-card-name {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+html[dir="rtl"] .svc-card-name { font-family: var(--font-arabic); font-weight: 700; }
+.svc-card-parent,
+.svc-card-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.svc-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.svc-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform var(--svc-duration-fast) var(--svc-ease),
+              background var(--svc-duration-fast) var(--svc-ease),
+              color var(--svc-duration-fast) var(--svc-ease);
+}
+.svc-book {
+  background: var(--accent-strong);
+  color: var(--white);
+}
+.svc-book:hover { background: var(--accent); }
+.svc-add {
+  border: 1.5px solid var(--accent-strong);
+  color: var(--accent-strong);
+  background: transparent;
+}
+.svc-add:hover { background: var(--gold-100); }
+.svc-add.is-added { background: var(--accent-strong); color: var(--white); }
+.svc-action:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* ---------- Add-ons group ---------- */
+.svc-addons { margin-top: 28px; }
+.svc-addons-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+html[dir="rtl"] .svc-addons-title { font-family: var(--font-arabic); letter-spacing: normal; }
+.svc-addons-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--svc-hairline);
+}
+/* This heading sits bare in the gap between card rows, not inside a
+   card, so it needs its own on-photo treatment for contrast. */
+.services-panel.has-photo .svc-addons-title {
+  color: var(--on-photo);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+.services-panel.has-photo .svc-addons-title::after {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- Helper card (fills a short subcategory) ---------- */
+.svc-helper {
+  margin-top: 22px;
+  padding: 22px 24px;
+  border-radius: var(--svc-radius-sm);
+  background: linear-gradient(135deg, rgba(235, 217, 207, 0.85), rgba(243, 221, 211, 0.45));
+  opacity: 0;
+  transform: translateY(var(--svc-rise));
+  transition: opacity var(--svc-duration) var(--svc-ease),
+              transform var(--svc-duration-fast) var(--svc-ease);
+}
+.services-panel.has-photo .svc-helper {
+  background: linear-gradient(135deg, rgba(235, 217, 207, 0.62), rgba(243, 221, 211, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.svc-helper.is-in { opacity: 1; transform: none; }
+.svc-helper-title {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+  color: var(--text);
+}
+html[dir="rtl"] .svc-helper-title { font-family: var(--font-arabic); font-weight: 700; }
+.svc-helper-text {
+  margin: 0 0 16px;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+.svc-helper-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.svc-helper-list li {
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.7);
+}
+.svc-helper-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 50px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--accent-strong);
+  transition: background var(--svc-duration-fast) var(--svc-ease);
+}
+.svc-helper-cta:hover { background: var(--accent); }
+
+.svc-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.services-panel.has-photo .svc-empty {
+  color: var(--on-photo-soft);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- "Build your visit" (SERVICES_CONFIG.bookingMode) ---------- */
+.visit-summary {
+  position: fixed;
+  z-index: 950;
+  inset-inline-start: 26px;
+  bottom: 26px;
+  width: min(320px, calc(100vw - 52px));
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: 0 18px 44px rgba(126, 70, 51, 0.22);
+}
+.visit-summary[hidden] { display: none; }
+.visit-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.visit-title { margin: 0; font-size: 1.02rem; color: var(--text); }
+html[dir="rtl"] .visit-title { font-family: var(--font-arabic); font-weight: 700; }
+.visit-count { font-size: 0.76rem; color: var(--text-muted); }
+.visit-empty { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+.visit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.visit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--text);
+}
+.visit-remove {
+  flex-shrink: 0;
+  width: 24px; height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+.visit-remove:hover { color: var(--accent-strong); background: var(--surface-alt); }
+.visit-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--svc-hairline);
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+.visit-total strong { color: var(--text); }
+.visit-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.visit-book {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 50px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--accent-strong);
+}
+.visit-book:hover { background: var(--accent); }
+.visit-clear {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 50px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+.visit-clear:hover { color: var(--accent-strong); background: var(--surface-alt); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1023px) {
+  .services-menu { grid-template-columns: 200px minmax(0, 1fr); gap: 18px; }
+}
+
+/* Between 768 and ~1100 the sidebar is still there but the panel is too
+   narrow for two readable cards, so drop to one column early. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .svc-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 767px) {
+  /* Sidebar becomes a horizontal chip row so services get full width. */
+  .services-menu { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .services-rail-wrap { position: static; }
+  .services-rail {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .services-rail::-webkit-scrollbar { display: none; }
+  .rail-item { flex: 0 0 auto; scroll-snap-align: center; }
+  .services-rail-fade { display: none; }
+  .services-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .services-tabs::-webkit-scrollbar { display: none; }
+  .services-tab { scroll-snap-align: center; }
+  .services-panel { border-radius: 20px; height: clamp(380px, 62vh, 560px); }
+  .svc-panel-head { gap: 12px; padding: 18px 16px; }
+  .svc-panel-body { padding: 16px 16px 20px; }
+  .svc-search { width: 100%; }
+
+  /* Summary docks to the bottom of the screen and lifts the FABs clear. */
+  .visit-summary {
+    inset-inline: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  body.has-visit-summary .whatsapp-fab { bottom: 210px; }
+  body.has-visit-summary .call-fab { bottom: 282px; }
+}
+
+@media (max-width: 639px) {
+  .svc-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Phones: trim the row's fixed furniture (icon, gaps, button padding) so
+   the service name gets the width it needs and stops wrapping to three
+   lines. */
+@media (max-width: 480px) {
+  .svc-card { gap: 10px; padding: 12px 13px; }
+  .svc-card-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .svc-card-icon svg { width: 19px; height: 19px; }
+  .svc-card-name { font-size: 0.93rem; }
+  .svc-action { padding: 0 15px; font-size: 0.82rem; }
+  .svc-panel-icon { width: 40px; height: 40px; border-radius: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator,
+  .rail-indicator,
+  .svc-card,
+  .svc-helper,
+  .svc-action { transition: opacity 120ms linear; }
+  .svc-card,
+  .svc-helper { opacity: 1; transform: none; }
+  .svc-card.is-in:hover { transform: none; }
+  .svc-panel-body.is-entering { animation: none; }
+}
+
+/* ---------- Gallery ---------- */
+.gallery { background: var(--bg); }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.gallery-grid a {
+  display: block;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1/1;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.gallery-grid img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.gallery-grid a:hover img { transform: scale(1.08); }
+.gallery-grid a:nth-child(4n+1) { grid-row: span 2; aspect-ratio: 1/2; }
+
+/* ---------- Testimonials ---------- */
+.testimonials { background: linear-gradient(180deg, var(--bg-alt), var(--bg)); }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.testimonial-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+.testimonial-stars { color: var(--gold-700); font-size: 1rem; margin-bottom: 14px; letter-spacing: 2px; }
+.testimonial-text { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 18px; font-style: italic; }
+.testimonial-name { font-weight: 600; color: var(--gold-700); }
+
+/* ---------- Contact ---------- */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 40px;
+  align-items: start;
+}
+.contact-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 36px;
+  border: 1px solid var(--border);
+}
+.contact-item {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.contact-icon {
+  font-size: 1.3rem;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-alt);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.contact-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
+.contact-item p { color: var(--ink-soft); font-size: 0.92rem; }
+.phone-link { transition: color 0.2s ease; }
+.phone-link:hover { color: var(--gold-700); text-decoration: underline; }
+.footer-contact .phone-link:hover { color: var(--gold-300); }
+
+.hours-block { margin: 24px 0; padding-top: 20px; border-top: 1px solid var(--surface-alt); }
+.hours-block h4 { margin-bottom: 12px; font-size: 0.95rem; }
+.hours-table { width: 100%; border-collapse: collapse; }
+.hours-table td { padding: 6px 0; font-size: 0.9rem; color: var(--ink-soft); }
+.hours-table td:last-child { text-align: end; font-weight: 600; color: var(--gold-700); }
+
+.social-icons { display: flex; gap: 12px; }
+.social-icon {
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--gold-700);
+  transition: all 0.2s ease;
+}
+.social-icon:hover { background: var(--gold-600); color: var(--black-text); transform: translateY(-2px); }
+
+.map-title { font-size: 1rem; margin-bottom: 14px; }
+.map-frame {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  height: 460px;
+  border: 1px solid var(--border);
+}
+
+/* ---------- Footer ---------- */
+.site-footer { background: var(--footer-bg); color: rgba(255, 249, 245, 0.85); padding-top: 72px; }
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+}
+.footer-brand .brand-name { color: var(--gold-500); font-size: 1.3rem; display: block; margin: 12px 0 14px; }
+.footer-logo { width: 56px; height: 56px; border-radius: 50%; }
+.footer-brand p { font-size: 0.88rem; opacity: 0.75; max-width: 320px; }
+.site-footer h4 { color: var(--gold-300); font-size: 1rem; margin-bottom: 18px; }
+.footer-links ul { display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 0.9rem; opacity: 0.8; transition: opacity 0.2s ease; }
+.footer-links a:hover { opacity: 1; color: var(--gold-300); }
+.footer-contact p { font-size: 0.88rem; opacity: 0.8; margin-bottom: 8px; }
+.footer-contact .social-icons { margin-top: 14px; }
+.footer-contact .social-icon { background: rgba(255, 255, 255, 0.08); color: var(--gold-300); }
+
+.footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 22px 0; }
+.footer-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.82rem;
+  opacity: 0.7;
+}
+
+/* ---------- Call + WhatsApp FABs ---------- */
+.whatsapp-fab,
+.call-fab {
+  position: fixed;
+  right: 26px;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 900;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: transform 0.2s ease;
+}
+.whatsapp-fab {
+  bottom: 26px;
+  background: #25D366;
+  color: var(--white);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  animation: pulse 2.4s infinite;
+}
+.call-fab {
+  bottom: 98px;
+  background: linear-gradient(135deg, var(--gold-600), var(--gold-500));
+  color: var(--black-text);
+  box-shadow: var(--shadow-md);
+}
+html[dir="rtl"] .whatsapp-fab,
+html[dir="rtl"] .call-fab { right: auto; left: 26px; }
+.whatsapp-fab:hover,
+.call-fab:hover { transform: scale(1.08); }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.45); }
+  70% { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
+  100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+}
+
+/* ---------- Scroll reveal (fade-in / scale-in on view) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  transition: opacity 0.75s var(--motion-ease), transform 0.75s var(--motion-ease);
+  will-change: opacity, transform;
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* ---------- Staggered card cascade (cards/tiles pop in one after another,
+   inspired by the cascading grid reveals on kuruvaislandresort.com) ---------- */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.55s var(--motion-ease), transform 0.55s var(--motion-ease);
+}
+.reveal-item:nth-child(odd) { transform: translateY(26px) translateX(-10px); }
+.reveal-item:nth-child(even) { transform: translateY(26px) translateX(10px); }
+.reveal-item.in-view {
+  opacity: 1;
+  transform: translateY(0) translateX(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-item { transition: none; opacity: 1; transform: none; }
+}
+
+/* Subtle hover lift to match the interactive card feel of the reference site */
+.testimonial-card,
+.stat-box {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.testimonial-card:hover,
+.stat-box:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .about-inner { grid-template-columns: 1fr; }
+  .about-media { max-width: 420px; margin: 0 auto; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 860px) {
+  .main-nav {
+    position: fixed;
+    top: var(--header-h);
+    inset-inline: 0;
+    background: var(--bg-alt);
+    box-shadow: var(--shadow-md);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .main-nav.open { max-height: 400px; }
+  .main-nav ul { flex-direction: column; gap: 0; padding: 8px 24px 20px; }
+  .main-nav a { display: block; padding: 14px 0; border-bottom: 1px solid var(--surface-alt); }
+  .hamburger { display: flex; }
+  .btn-book-now { display: none; }
+}
+
+@media (max-width: 640px) {
+  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid a:nth-child(4n+1) { grid-row: auto; aspect-ratio: 1/1; }
+  .brand-name { display: none; }
+  .footer-inner { grid-template-columns: 1fr; text-align: center; }
+  .footer-brand p { margin: 0 auto; }
+  .footer-links, .footer-contact { text-align: center; }
+  .footer-contact .social-icons { justify-content: center; }
+  .footer-bottom-inner { justify-content: center; text-align: center; }
+  .sub-panel-title { font-size: 1rem; }
+  .service-list { grid-template-columns: 1fr; }
+  .contact-card { padding: 26px; }
+  .map-frame { height: 320px; }
+}
