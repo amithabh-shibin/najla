@@ -13,13 +13,15 @@
      CONFIG — edit these placeholders when real business details arrive
      --------------------------------------------------------------------- */
   const CONFIG = {
-    whatsappNumber: "971529527752", // primary — digits only, used for Book Now / hero / FAB / WhatsApp icon
+    whatsappNumber: "971555965577", // primary — digits only, used for Book Now / hero / FAB / WhatsApp icon
     whatsappNumberSecondary: "", // shown as a second contact line, also click-to-WhatsApp
     whatsappDefaultMessage: {
       en: "Hi Najla Chicago Salon! I'd like to book an appointment.",
       ar: "مرحبًا صالون نجلاء شيكاغو! أرغب في حجز موعد."
     },
-    instagramUrl: "https://instagram.com/",
+      facebookUrl: "https://www.facebook.com/NajlaChicagoSalon",
+  instagramUrl: "https://www.instagram.com/najla_chicagosalon/",
+  tiktokUrl: "https://www.tiktok.com/@najlachicagosalon?_r=1&_t=ZS-99zclOTzEfv",
     // Local photos only — no external placeholder services. Add/remove
     // entries here as real photos are swapped in under assets/images/.
     galleryImages: [
@@ -153,9 +155,22 @@
     if (footerPhone) footerPhone.innerHTML = phoneLinesHtml;
   }
 
-  function renderSocialIcons() {
-    $$('.social-whatsapp').forEach((a) => a.setAttribute("href", buildWhatsAppLink()));
-    $$('.social-instagram').forEach((a) => a.setAttribute("href", CONFIG.instagramUrl));
+ function renderSocialIcons() {
+  $$('.social-whatsapp').forEach((a) =>
+    a.setAttribute("href", buildWhatsAppLink())
+  );
+
+  $$('.social-facebook').forEach((a) =>
+    a.setAttribute("href", CONFIG.facebookUrl)
+  );
+
+  $$('.social-instagram').forEach((a) =>
+    a.setAttribute("href", CONFIG.instagramUrl)
+  );
+
+  $$('.social-tiktok').forEach((a) =>
+    a.setAttribute("href", CONFIG.tiktokUrl)
+  );
 
     const footerTarget = $("#footerSocialIcons");
     if (footerTarget && !footerTarget.dataset.built) {
@@ -166,7 +181,28 @@
         </a>
         <a href="${CONFIG.instagramUrl}" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon social-instagram">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/></svg>
-        </a>`;
+        </a>
+        <!-- Facebook -->
+<a href="${CONFIG.facebookUrl}"
+   target="_blank"
+   rel="noopener"
+   aria-label="Facebook"
+   class="social-icon social-facebook">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M22 12a10 10 0 10-11.563 9.875v-6.988H7.898V12h2.539V9.797c0-2.506 1.493-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.261c-1.243 0-1.63.772-1.63 1.563V12h2.773l-.443 2.887h-2.33v6.988A10.002 10.002 0 0022 12z"/>
+  </svg>
+</a>
+
+<!-- TikTok -->
+<a href="${CONFIG.tiktokUrl}"
+   target="_blank"
+   rel="noopener"
+   aria-label="TikTok"
+   class="social-icon social-tiktok">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.589 6.686a4.793 4.793 0 01-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 01-5.201 1.743 2.895 2.895 0 012.31-4.64c.298 0 .59.046.868.133V9.404a6.33 6.33 0 00-.868-.06A6.344 6.344 0 003.14 15.687a6.344 6.344 0 0010.836 4.486 6.305 6.305 0 001.843-4.486V8.755a8.16 8.16 0 004.773 1.526V6.837a4.85 4.85 0 01-1.003-.151z"/>
+  </svg>
+</a>`;
     }
   }
 

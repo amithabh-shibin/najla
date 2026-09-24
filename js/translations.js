@@ -110,9 +110,8 @@ const UI = {
       emailValue: "info@najlachicagosalon.ae",
       hoursLabel: "Opening Hours",
       hours: [
-        { day: "Saturday – Thursday", time: "10:00 AM – 10:00 PM" },
-        { day: "Friday", time: "2:00 PM – 10:00 PM" }
-      ],
+  { day: "Monday – Sunday", time: "10:00 AM – 10:00 PM" }
+],
       formTitle: "Send Us a Message",
       formName: "Your Name",
       formPhone: "Phone Number",
