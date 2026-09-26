@@ -13,7 +13,7 @@ const SERVICES_CONFIG = {
   // Prices exist in the data below for every service, but are hidden by
   // default — pricing was deliberately taken off the public site. Flip to
   // true to show them on the cards (and in "Build your visit" totals).
-  showPrices: false,
+  showPrices: true,
 
   // Durations render only where a service actually declares
   // `durationMinutes` (see "Optional per-service fields" below). No
